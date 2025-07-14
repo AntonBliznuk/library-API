@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Book(models.Model):
     class CoverChoices(models.TextChoices):
         HARD = "HARD", "Hard"
@@ -12,9 +13,7 @@ class Book(models.Model):
         choices=CoverChoices.choices,
     )
     inventory = models.PositiveIntegerField(default=0)
-    daily_fee = models.DecimalField(
-        max_digits=10, decimal_places=2
-    )
+    daily_fee = models.DecimalField(max_digits=10, decimal_places=2)
 
     class Meta:
         verbose_name = "book"
