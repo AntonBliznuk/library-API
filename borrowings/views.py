@@ -3,6 +3,9 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from drf_spectacular.utils import extend_schema, OpenApiParameter
+from drf_spectacular.types import OpenApiTypes
+
 from borrowings.models import Borrowing
 from borrowings.permissions import (
     IsBorrowingOwner,
@@ -77,3 +80,20 @@ class BorrowingViewSet(viewsets.ModelViewSet):
             {"message": "This book is now returned."},
             status=status.HTTP_200_OK
         )
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="is_active",
+                description="Whether the borrowings is active or not.",
+                type=OpenApiTypes.BOOL,
+            ),
+            OpenApiParameter(
+                name="user_id",
+                description="The ID of the user who owns the borrowing (only for admins).",
+                type=OpenApiTypes.INT,
+            )
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
