@@ -3,11 +3,11 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from drf_spectacular.utils import extend_schema, OpenApiParameter
+from drf_spectacular.types import OpenApiTypes
+
 from borrowings.models import Borrowing
-from borrowings.permissions import (
-    IsBorrowingOwner,
-    IsAdminOrIsAuthenticatedOnlyCreate
-)
+from borrowings.permissions import IsBorrowingOwner, IsAdminOrIsAuthenticatedOnlyCreate
 from borrowings.serializers import (
     BorrowingListSerializer,
     BorrowingRetrieveSerializer,
@@ -15,15 +15,11 @@ from borrowings.serializers import (
 
 
 class BorrowingViewSet(viewsets.ModelViewSet):
-    queryset = Borrowing.objects.select_related(
-        "user", "book"
-    )
+    queryset = Borrowing.objects.select_related("user", "book")
     permission_classes = [IsAdminOrIsAuthenticatedOnlyCreate]
 
     def get_queryset(self):
-        queryset = Borrowing.objects.select_related(
-            "user", "book"
-        )
+        queryset = Borrowing.objects.select_related("user", "book")
 
         is_active = self.request.query_params.get("is_active")
         if is_active == "true":
@@ -39,7 +35,6 @@ class BorrowingViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(user_id=user_id)
 
         return queryset
-
 
     def get_serializer_class(self):
         if self.action in {"retrieve", "update", "partial_update"}:
@@ -57,7 +52,7 @@ class BorrowingViewSet(viewsets.ModelViewSet):
         if borrowing.actual_return_date is not None:
             return Response(
                 {"message": "This book is already returned."},
-                status=status.HTTP_409_CONFLICT
+                status=status.HTTP_409_CONFLICT,
             )
 
         book = borrowing.book
@@ -67,13 +62,29 @@ class BorrowingViewSet(viewsets.ModelViewSet):
         if borrowing.borrow_date >= timezone.now().date():
             return Response(
                 {"message": "This book is not borrowed yet."},
-                status=status.HTTP_409_CONFLICT
+                status=status.HTTP_409_CONFLICT,
             )
 
         borrowing.actual_return_date = timezone.now()
         borrowing.save()
 
         return Response(
-            {"message": "This book is now returned."},
-            status=status.HTTP_200_OK
+            {"message": "This book is now returned."}, status=status.HTTP_200_OK
         )
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="is_active",
+                description="Whether the borrowings is active or not.",
+                type=OpenApiTypes.BOOL,
+            ),
+            OpenApiParameter(
+                name="user_id",
+                description="The ID of the user who owns the borrowing (only for admins).",
+                type=OpenApiTypes.INT,
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)

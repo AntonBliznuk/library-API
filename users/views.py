@@ -42,7 +42,7 @@ class LogoutUserView(APIView):
         if not refresh_token:
             return Response(
                 {"detail": "Refresh token is required."},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         try:
@@ -52,5 +52,5 @@ class LogoutUserView(APIView):
         except Exception:
             return Response(
                 {"detail": "Invalid or expired token."},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
