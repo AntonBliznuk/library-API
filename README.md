@@ -10,8 +10,8 @@ Make sure you have Python 3
 
 1️⃣ Clone the project:
 ```bash
-git clone https://github.com/yourusername/your-repo-name.git
-cd your-repo-name
+git clone https://github.com/yourusername/DRF-library-practice.git
+cd DRF-library-practice
 ```
 
 ⸻
