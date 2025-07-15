@@ -14,6 +14,7 @@ packaging==25.0
 pathspec==0.12.1
 platformdirs==4.3.8
 PyJWT==2.9.0
+python-decouple==3.8
 PyYAML==6.0.2
 referencing==0.36.2
 rpds-py==0.26.0
