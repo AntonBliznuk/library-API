@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
 from users.serializers import UserSerializer
 from books.serializers import BookSerializer
@@ -31,11 +32,30 @@ class BorrowingListSerializer(serializers.ModelSerializer):
             "actual_return_date"
         )
 
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        book = attrs["book_id"]
+        if book.inventory <= 0:
+            raise ValidationError({
+                "book_id": "This book is not available.",
+            })
+        if attrs["borrow_date"] > attrs["expected_return_date"]:
+            raise ValidationError({
+                "expected_return_date": "Expected return date must come after borrowing date.",
+            })
+
+        return attrs
+
     def create(self, validated_data):
         book = validated_data.pop("book_id")
         user = self.context["request"].user
+
+        book.inventory -= 1
+        book.save()
+
         borrowing = Borrowing.objects.create(book=book, user=user, **validated_data)
         return borrowing
+
 
 class BorrowingRetrieveSerializer(serializers.ModelSerializer):
     book = BookSerializer(read_only=True)
