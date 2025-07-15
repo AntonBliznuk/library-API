@@ -28,22 +28,23 @@ class BorrowingListSerializer(serializers.ModelSerializer):
             "book_title",
             "book_id",
         )
-        read_only_fields = (
-            "id",
-            "actual_return_date"
-        )
+        read_only_fields = ("id", "actual_return_date")
 
     def validate(self, attrs):
         attrs = super().validate(attrs)
         book = attrs["book_id"]
         if book.inventory <= 0:
-            raise ValidationError({
-                "book_id": "This book is not available.",
-            })
+            raise ValidationError(
+                {
+                    "book_id": "This book is not available.",
+                }
+            )
         if attrs["borrow_date"] > attrs["expected_return_date"]:
-            raise ValidationError({
-                "expected_return_date": "Expected return date must come after borrowing date.",
-            })
+            raise ValidationError(
+                {
+                    "expected_return_date": "Expected return date must come after borrowing date.",
+                }
+            )
 
         return attrs
 
@@ -69,7 +70,7 @@ class BorrowingRetrieveSerializer(serializers.ModelSerializer):
             "expected_return_date",
             "actual_return_date",
             "user",
-            "book"
+            "book",
         )
         read_only_fields = (
             "id",

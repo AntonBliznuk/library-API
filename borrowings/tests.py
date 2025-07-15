@@ -6,11 +6,11 @@ from datetime import date
 
 User = get_user_model()
 
+
 class BorrowingModelTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
-            email="testuser@example.com",
-            password="password123"
+            email="testuser@example.com", password="password123"
         )
         self.book = Book.objects.create(
             title="Test Book",
@@ -23,7 +23,7 @@ class BorrowingModelTest(TestCase):
             user=self.user,
             book=self.book,
             borrow_date=date(2025, 7, 10),
-            expected_return_date=date(2025, 7, 20)
+            expected_return_date=date(2025, 7, 20),
         )
 
     def test_borrowing_str(self):
@@ -72,8 +72,12 @@ class BorrowingViewSetTests(APITestCase):
         )
 
         self.url_list = reverse("borrowings:borrowing-list")
-        self.url_detail = reverse("borrowings:borrowing-detail", args=[self.borrowing.id])
-        self.url_return = reverse("borrowings:borrowing-return-borrowing", args=[self.borrowing.id])
+        self.url_detail = reverse(
+            "borrowings:borrowing-detail", args=[self.borrowing.id]
+        )
+        self.url_return = reverse(
+            "borrowings:borrowing-return-borrowing", args=[self.borrowing.id]
+        )
 
     def authenticate(self, user):
         refresh = RefreshToken.for_user(user)
@@ -122,7 +126,9 @@ class BorrowingViewSetTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
 
     def test_permission_only_owner_can_return(self):
-        other_user = User.objects.create_user(email="other@example.com", password="pass")
+        other_user = User.objects.create_user(
+            email="other@example.com", password="pass"
+        )
         self.authenticate(other_user)
         response = self.client.post(self.url_return)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
