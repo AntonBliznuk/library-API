@@ -2,13 +2,17 @@
 
 Task says that I have to choose from six to eight tasks from Coding Mandatory, I have chosen the first seven tasks from Coding Mandatory.
 
-🚀 Local Installation Guide
-
-Make sure you have Python 3
+Here’s a clear, updated version of your installation guide for Docker Compose workflow:
 
 ⸻
 
-1️⃣ Clone the project:
+🚀 Local Installation Guide
+
+Make sure you have Docker and Docker Compose installed.
+
+⸻
+
+1️⃣ Clone the Project
 ```bash
 git clone https://github.com/yourusername/DRF-library-practice.git
 cd DRF-library-practice
@@ -16,50 +20,30 @@ cd DRF-library-practice
 
 ⸻
 
-2️⃣ Set up a virtual environment:
-```bash
-python -m venv venv
-source venv/bin/activate  # For Windows: venv\Scripts\activate
-```
-
-⸻
-
-3️⃣ Install required packages:
-```bash
-pip install -r requirements.txt
-```
-
-⸻
-
-4️⃣ Set up environment variables:
-
-•	Copy the example environment file:
+2️⃣ Set Up Environment Variables
 ```bash
 cp env.sample .env
 ```
 
-•	Open .env and fill in your secrets.
+Open .env and fill in your secrets.
 
 ⸻
 
-5️⃣ Create and apply database migrations:
-
+3️⃣ Build and Run the Project with Docker Compose
 ```bash
-python manage.py makemigrations
-python manage.py migrate
+docker-compose up --build
 ```
+This will:
+
+Install dependencies.
+
+Create and apply migrations automatically.
+
+Run the Django development server.
 
 ⸻
 
-6️⃣ Create a superuser (optional but helpful):
-```bash
-python manage.py createsuperuser
-```
+4️⃣ Access the Project
 
-⸻
-
-7️⃣ Launch the server:
-```bash
-python manage.py runserver
-```
-Now you can open http://127.0.0.1:8000/api/doc/swagger/ and start exploring the project!
+•	Open your browser and go to:
+http://0.0.0.0:8000/api/doc/swagger/
