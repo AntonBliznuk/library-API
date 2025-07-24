@@ -2,8 +2,7 @@ from rest_framework.permissions import SAFE_METHODS, BasePermission
 
 
 class IsAdminUserOrReadOnly(BasePermission):
-    """
-    Allows read-only access for any user,
+    """Allows read-only access for any user,
     but write permissions are only granted to admin users.
     """
 

@@ -1,11 +1,10 @@
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from users.serializers import UserSerializer
-from books.serializers import BookSerializer
-
 from books.models import Book
+from books.serializers import BookSerializer
 from borrowings.models import Borrowing
+from users.serializers import UserSerializer
 
 
 class BorrowingListSerializer(serializers.ModelSerializer):
@@ -42,7 +41,8 @@ class BorrowingListSerializer(serializers.ModelSerializer):
         if attrs["borrow_date"] > attrs["expected_return_date"]:
             raise ValidationError(
                 {
-                    "expected_return_date": "Expected return date must come after borrowing date.",
+                    "expected_return_date":
+                        "Expected return date must come after borrowing date.",
                 }
             )
 
