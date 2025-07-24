@@ -1,5 +1,6 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+
 from borrowings.models import Borrowing
 from utils.telegram import send_telegram_message
 
