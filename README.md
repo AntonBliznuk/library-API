@@ -22,7 +22,7 @@ cd DRF-library-practice
 
 2️⃣ Set Up Environment Variables
 ```bash
-cp env.sample .env
+cp .env.sample .env
 ```
 
 Open .env and fill in your secrets.
