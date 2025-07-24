@@ -1,13 +1,12 @@
 from django.utils import timezone
-from rest_framework import viewsets, status
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter, extend_schema
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from drf_spectacular.utils import extend_schema, OpenApiParameter
-from drf_spectacular.types import OpenApiTypes
-
 from borrowings.models import Borrowing
-from borrowings.permissions import IsBorrowingOwner, IsAdminOrIsAuthenticatedOnlyCreate
+from borrowings.permissions import IsAdminOrIsAuthenticatedOnlyCreate, IsBorrowingOwner
 from borrowings.serializers import (
     BorrowingListSerializer,
     BorrowingRetrieveSerializer,
@@ -81,7 +80,8 @@ class BorrowingViewSet(viewsets.ModelViewSet):
             ),
             OpenApiParameter(
                 name="user_id",
-                description="The ID of the user who owns the borrowing (only for admins).",
+                description="The ID of the user who"
+                            " owns the borrowing (only for admins).",
                 type=OpenApiTypes.INT,
             ),
         ]

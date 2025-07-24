@@ -1,15 +1,15 @@
 from django.urls import path
-from users.views import (
-    CreateUserView,
-    ManageUserView,
-    LogoutUserView,
-    ThrottledLoginView,
-)
 from rest_framework_simplejwt.views import (
     TokenRefreshView,
     TokenVerifyView,
 )
 
+from users.views import (
+    CreateUserView,
+    LogoutUserView,
+    ManageUserView,
+    ThrottledLoginView,
+)
 
 app_name = "user"
 

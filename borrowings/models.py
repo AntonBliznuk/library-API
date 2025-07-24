@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Q, F
+from django.db.models import F, Q
 
 from books.models import Book
 from users.models import User

@@ -1,3 +1,4 @@
+# Dockerfile for Render deployment
 FROM python:3.12-slim
 
 LABEL maintainer="antonbliznuk71@gmail.com"
@@ -12,4 +13,4 @@ RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD ["bash", "-c", "python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
+CMD ["sh", "-c", "python manage.py makemigrations && python manage.py migrate && python manage.py collectstatic --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:8000"]
