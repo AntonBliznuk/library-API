@@ -6,4 +6,4 @@ class BorrowingsConfig(AppConfig):
     name = "borrowings"
 
     def ready(self):
-        pass
+        import borrowings.signals  # noqa: F401
