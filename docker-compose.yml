@@ -2,7 +2,7 @@ services:
   library:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     ports:
       - "8000:8000"
     command: >
@@ -11,6 +11,8 @@ services:
     env_file:
       - .env
     restart: always
+    volumes:
+      - ./:/app
 
   db:
     image: postgres:15.13-bookworm
