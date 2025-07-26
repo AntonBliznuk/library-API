@@ -3,7 +3,7 @@ from rest_framework.exceptions import ValidationError
 
 from books.models import Book
 from books.serializers import BookSerializer
-from borrowings.models import Borrowing
+from borrowings.models import Borrowing, Payment
 from users.serializers import UserSerializer
 
 
@@ -75,4 +75,75 @@ class BorrowingRetrieveSerializer(serializers.ModelSerializer):
         read_only_fields = (
             "id",
             "actual_return_date",
+        )
+
+
+class PaymentListSerializer(serializers.ModelSerializer):
+    borrowing = BorrowingListSerializer(read_only=True)
+    borrowing_id = serializers.PrimaryKeyRelatedField(
+        queryset=Borrowing.objects.all(),
+        write_only=True,
+    )
+
+    class Meta:
+        model = Payment
+        fields = (
+            "id",
+            "payment_status",
+            "payment_type",
+            "borrowing_id",
+            "borrowing",
+            "session_url",
+            "session_id",
+            "usd_to_pay",
+        )
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        borrowing = attrs.get("borrowing_id")
+        payment_type = attrs.get("payment_type")
+        payment_status = Payment.PaymentStatusChoices.PENDING
+
+        if Payment.objects.filter(
+            borrowing=borrowing,
+            payment_status=payment_status,
+            payment_type=payment_type,
+        ).exists():
+            raise ValidationError(
+                f"A pending payment of type '{payment_type}' "
+                f"already exists for this borrowing."
+            )
+        return attrs
+
+
+    def create(self, validated_data):
+        borrowing = validated_data.pop("borrowing_id")
+        payment = Payment.objects.create(
+            borrowing=borrowing,
+            **validated_data
+        )
+        return payment
+
+
+class PaymentRetrieveSerializer(serializers.ModelSerializer):
+    borrowing = BorrowingRetrieveSerializer(read_only=True)
+
+    class Meta:
+        model = Payment
+        fields = (
+            "id",
+            "payment_status",
+            "payment_type",
+            "borrowing",
+            "session_url",
+            "session_id",
+            "usd_to_pay",
+        )
+        read_only_fields = (
+            "id",
+            "payment_status",
+            "payment_type",
+            "session_url",
+            "session_id",
+            "usd_to_pay",
         )

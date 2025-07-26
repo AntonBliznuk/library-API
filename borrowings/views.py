@@ -4,12 +4,15 @@ from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
-from borrowings.models import Borrowing
+from borrowings.models import Borrowing, Payment
 from borrowings.permissions import IsAdminOrIsAuthenticatedOnlyCreate, IsBorrowingOwner
 from borrowings.serializers import (
     BorrowingListSerializer,
     BorrowingRetrieveSerializer,
+    PaymentListSerializer,
+    PaymentRetrieveSerializer,
 )
 
 
@@ -88,3 +91,23 @@ class BorrowingViewSet(viewsets.ModelViewSet):
     )
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
+
+
+class PaymentViewSet(viewsets.ModelViewSet):
+    queryset = Payment.objects.select_related("borrowing")
+    permission_classes = [IsAuthenticated]
+
+    def get_serializer_class(self):
+        if self.action in {"retrieve", "update", "partial_update"}:
+            return PaymentRetrieveSerializer
+        return PaymentListSerializer
+
+    def get_queryset(self):
+        queryset = self.queryset
+
+        if not self.request.user.is_staff:
+            queryset = queryset.filter(
+                borrowing__user=self.request.user,
+            )
+
+        return queryset
