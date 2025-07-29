@@ -48,6 +48,7 @@ rpds-py==0.26.0
 ruff==0.12.4
 six==1.17.0
 sqlparse==0.5.3
+stripe==12.3.0
 tomli==2.2.1
 typing_extensions==4.14.1
 tzdata==2025.2
