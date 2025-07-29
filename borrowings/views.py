@@ -96,6 +96,7 @@ class BorrowingViewSet(viewsets.ModelViewSet):
 class PaymentViewSet(viewsets.ModelViewSet):
     queryset = Payment.objects.select_related("borrowing")
     permission_classes = [IsAuthenticated]
+    allowed_methods = ["get"]
 
     def get_serializer_class(self):
         if self.action in {"retrieve", "update", "partial_update"}:
