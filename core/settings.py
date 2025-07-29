@@ -161,5 +161,8 @@ CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
-
+# Stripe
 stripe.api_key = config("STRIPE_SECRET_KEY")
+
+# App
+FINE_MULTIPLIER = config("FINE_MULTIPLIER", cast=float, default=2.0)

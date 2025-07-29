@@ -42,6 +42,14 @@ class Borrowing(models.Model):
         days = (self.expected_return_date - self.borrow_date).days
         return max(days, 1)
 
+    def calculate_overdue_days(self):
+        if (
+            self.actual_return_date and
+            self.actual_return_date.date() > self.expected_return_date
+        ):
+            return (self.actual_return_date.date() - self.expected_return_date).days
+        return 0
+
 
 class Payment(models.Model):
     class PaymentStatusChoices(models.TextChoices):
