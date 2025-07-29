@@ -6,6 +6,8 @@ from books.serializers import BookSerializer
 from borrowings.models import Borrowing, Payment
 from users.serializers import UserSerializer
 
+from utils.stripe import create_stripe_session_for_borrowing
+
 
 class BorrowingListSerializer(serializers.ModelSerializer):
     user_email = serializers.CharField(source="user.email", read_only=True)
@@ -56,25 +58,22 @@ class BorrowingListSerializer(serializers.ModelSerializer):
         book.save()
 
         borrowing = Borrowing.objects.create(book=book, user=user, **validated_data)
+
+        create_stripe_session_for_borrowing(borrowing)
+
         return borrowing
 
 
-class BorrowingRetrieveSerializer(serializers.ModelSerializer):
-    book = BookSerializer(read_only=True)
-    user = UserSerializer(read_only=True)
-
+class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Borrowing
+        model = Payment
         fields = (
-            "borrow_date",
-            "expected_return_date",
-            "actual_return_date",
-            "user",
-            "book",
-        )
-        read_only_fields = (
             "id",
-            "actual_return_date",
+            "payment_status",
+            "payment_type",
+            "session_url",
+            "session_id",
+            "usd_to_pay",
         )
 
 
@@ -88,6 +87,16 @@ class PaymentListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
         fields = (
+            "id",
+            "payment_status",
+            "payment_type",
+            "borrowing_id",
+            "borrowing",
+            "session_url",
+            "session_id",
+            "usd_to_pay",
+        )
+        read_only_fields = (
             "id",
             "payment_status",
             "payment_type",
@@ -123,6 +132,29 @@ class PaymentListSerializer(serializers.ModelSerializer):
             **validated_data
         )
         return payment
+
+
+class BorrowingRetrieveSerializer(serializers.ModelSerializer):
+    book = BookSerializer(read_only=True)
+    user = UserSerializer(read_only=True)
+    payments = PaymentSerializer(
+        many=True, read_only=True, source="payment_set"
+    )
+
+    class Meta:
+        model = Borrowing
+        fields = (
+            "borrow_date",
+            "expected_return_date",
+            "actual_return_date",
+            "user",
+            "book",
+            "payments",
+        )
+        read_only_fields = (
+            "id",
+            "actual_return_date",
+        )
 
 
 class PaymentRetrieveSerializer(serializers.ModelSerializer):

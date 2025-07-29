@@ -36,6 +36,10 @@ class Borrowing(models.Model):
             f" Expected_date: {self.expected_return_date})"
         )
 
+    def calculate_borrowing_days(self):
+        days = (self.expected_return_date - self.borrow_date).days
+        return max(days, 1)
+
 
 class Payment(models.Model):
     class PaymentStatusChoices(models.TextChoices):
@@ -59,7 +63,7 @@ class Payment(models.Model):
     borrowing = models.ForeignKey(
         Borrowing, on_delete=models.CASCADE
     )
-    session_url = models.URLField()
+    session_url = models.URLField(max_length=1000)
     session_id = models.CharField(max_length=255)
     usd_to_pay = models.DecimalField(
         max_digits=8,
