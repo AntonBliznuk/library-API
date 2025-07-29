@@ -22,7 +22,7 @@ This project is designed for:
 
 ## 🔗 See in Action
 
-- 🌐 Live app: https://library-api-m7bp.onrender.com
+- 🌐 Live app: https://library-api-m7bp.onrender.com/api/doc/swagger
 - 📢 Telegram bot group: https://t.me/+xWoCk5JuSa9kZmYy
 
 ## ✨ Features
