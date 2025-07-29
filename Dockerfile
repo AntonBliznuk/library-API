@@ -16,4 +16,4 @@ COPY . .
 ARG SERVICE=web
 ENV SERVICE=${SERVICE}
 
-CMD ["sh", "-c", "python manage.py makemigrations && python manage.py migrate && python manage.py collectstatic --noinput && gunicorn core.wsgi:application --bind 0.0.0.0:8000"]
+CMD ["sh", "-c", "python manage.py makemigrations && python manage.py migrate && python manage.py loaddata admin-user-fixture.json && python manage.py collectstatic --noinput && gunicorn core.wsgi:application --bind 0.0.0.0:8000"]
