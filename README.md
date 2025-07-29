@@ -98,7 +98,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📬 Contact
 
-- **Author**: Bliznuk Anton
+- **Author**: Anton Bliznuk
 - **Email**: bliznukantonmain@gmail.com
 - **GitHub**: https://github.com/AntonBliznuk
 - **LinkedIn**: https://www.linkedin.com/in/anton-bliznuk-3499b234b
