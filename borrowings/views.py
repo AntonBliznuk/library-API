@@ -1,3 +1,5 @@
+import stripe
+
 from decimal import Decimal
 
 from django.utils import timezone
@@ -9,6 +11,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
+from utils.stripe import create_stripe_fine_payment
+from utils.telegram import send_telegram_message
 from borrowings.models import Borrowing, Payment
 from borrowings.permissions import IsAdminOrIsAuthenticatedOnlyCreate, IsBorrowingOwner
 from borrowings.serializers import (
@@ -17,10 +21,6 @@ from borrowings.serializers import (
     PaymentListSerializer,
     PaymentRetrieveSerializer,
 )
-
-import stripe
-
-from utils.stripe import create_stripe_fine_payment
 
 
 class BorrowingViewSet(viewsets.ModelViewSet):
@@ -156,6 +156,17 @@ class PaymentViewSet(viewsets.ModelViewSet):
         if session.payment_status == "paid":
             payment.payment_status = Payment.PaymentStatusChoices.PAID
             payment.save()
+            send_telegram_message(
+                (
+                    "✅ Payment Successful!\n\n"
+                    f"👤 User email: {payment.borrowing.user.email}\n"
+                    f"📚 Book: {payment.borrowing.book.title}\n"
+                    f"📅 Borrowed on: {payment.borrowing.borrow_date}\n"
+                    f"📅 Expected return on: {payment.borrowing.expected_return_date}\n"
+                    f"💰 Amount Paid: ${payment.usd_to_pay}\n\n"
+                    "Thank you for your payment! 📖✨"
+                )
+            )
             return Response({"message": "Payment confirmed!"})
 
         return Response({"message": "Session not marked as paid yet."}, status=202)
