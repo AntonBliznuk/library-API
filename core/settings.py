@@ -1,3 +1,6 @@
+import os
+import dj_database_url
+
 from datetime import timedelta
 from pathlib import Path
 
@@ -42,6 +45,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -55,7 +59,7 @@ ROOT_URLCONF = "core.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],
+        "DIRS": [],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -73,8 +77,12 @@ WSGI_APPLICATION = "core.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
-DATABASES = {
+if config("DATABASE_URL", default=None):
+    DATABASES = {
+        "default": dj_database_url.config(conn_max_age=600, ssl_require=True)
+    }
+else:
+    DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
             "NAME": config("POSTGRES_DB"),
@@ -122,6 +130,8 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
@@ -133,12 +143,24 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_THROTTLE_RATES": {
         "user": "1000/day",
         "anon": "100/day",
         "login": "5/minute",
     },
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 15,
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_RENDERER_CLASSES": (
+        [
+            "rest_framework.renderers.JSONRenderer",
+            "rest_framework.renderers.BrowsableAPIRenderer",
+        ]
+        if DEBUG
+        else [
+            "rest_framework.renderers.JSONRenderer",
+        ]
+    ),
 }
 
 
@@ -149,8 +171,15 @@ SIMPLE_JWT = {
 }
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Library-API",
-    "DESCRIPTION": "DRF Library Practice (Mate Academy)",
+    "TITLE": "library-API",
+    "DESCRIPTION": (
+        "A full-featured Library Management API with user-friendly borrowing logic, "
+        "Telegram bot notifications, background task processing via Celery, "
+        "Stripe payment integration, clean and simple code."
+        "Completely open source."
+        "Telegram group with the bot: https://t.me/+xWoCk5JuSa9kZmYy"
+        "GitHub repo: https://github.com/AntonBliznuk/library-API"
+    ),
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
 }
@@ -164,5 +193,5 @@ CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 # Stripe
 stripe.api_key = config("STRIPE_SECRET_KEY")
 
-# App
+# library-API
 FINE_MULTIPLIER = config("FINE_MULTIPLIER", cast=float, default=2.0)
