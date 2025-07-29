@@ -178,7 +178,6 @@ SPECTACULAR_SETTINGS = {
         "Stripe payment integration, clean and simple code."
         "Completely open source."
         "Telegram group with the bot: https://t.me/+xWoCk5JuSa9kZmYy"
-        "GitHub repo: https://github.com/AntonBliznuk/library-API"
     ),
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
