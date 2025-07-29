@@ -59,7 +59,7 @@ class BorrowingListSerializer(serializers.ModelSerializer):
 
         borrowing = Borrowing.objects.create(book=book, user=user, **validated_data)
 
-        create_stripe_session_for_borrowing(borrowing)
+        create_stripe_session_for_borrowing(borrowing, self.context["request"])
 
         return borrowing
 
@@ -158,7 +158,7 @@ class BorrowingRetrieveSerializer(serializers.ModelSerializer):
 
 
 class PaymentRetrieveSerializer(serializers.ModelSerializer):
-    borrowing = BorrowingRetrieveSerializer(read_only=True)
+    borrowing = BorrowingListSerializer(read_only=True)
 
     class Meta:
         model = Payment
