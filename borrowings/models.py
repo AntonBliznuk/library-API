@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.db import models
 from django.db.models import F, Q
 from django.core.validators import MinValueValidator
@@ -68,7 +70,7 @@ class Payment(models.Model):
     usd_to_pay = models.DecimalField(
         max_digits=8,
         decimal_places=2,
-        validators=[MinValueValidator(0.01)],
+        validators=[MinValueValidator(Decimal("0.01"))],
     )
 
     class Meta:

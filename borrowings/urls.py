@@ -8,7 +8,7 @@ from borrowings.views import (
 
 router = routers.DefaultRouter()
 router.register("borrowings", BorrowingViewSet)
-router.register("payments", PaymentViewSet)
+router.register("payments", PaymentViewSet, basename="payment")
 
 app_name = "borrowings"
 

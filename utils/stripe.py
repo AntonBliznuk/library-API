@@ -1,17 +1,27 @@
 import stripe
 from decimal import Decimal
-from decouple import config
 from borrowings.models import Payment
+from django.urls import reverse
 
 
-stripe.api_key = config("STRIPE_SECRET_KEY")
+def create_stripe_session_for_borrowing(borrowing, request):
+    total_price = borrowing.book.daily_fee * Decimal(
+        borrowing.calculate_borrowing_days()
+    )
 
+    payment = Payment.objects.create(
+        borrowing=borrowing,
+        payment_status=Payment.PaymentStatusChoices.PENDING,
+        payment_type=Payment.PaymentTypeChoices.PAYMENT,
+        usd_to_pay=total_price,
+    )
 
-def create_stripe_session_for_borrowing(borrowing):
-    total_price = (
-        borrowing.book.daily_fee * Decimal(
-            borrowing.calculate_borrowing_days()
-        )
+    success_url = request.build_absolute_uri(
+        reverse("borrowings:payment-success-payment", kwargs={"pk": payment.id})
+    ) + "?session_id={CHECKOUT_SESSION_ID}"
+
+    cancel_url = request.build_absolute_uri(
+        reverse("borrowings:payment-cancel-payment", kwargs={"pk": payment.id})
     )
 
     session = stripe.checkout.Session.create(
@@ -20,22 +30,19 @@ def create_stripe_session_for_borrowing(borrowing):
             "price_data": {
                 "currency": "usd",
                 "product_data": {
-                    "name": f"Borrowing Book {borrowing.book.title}"
+                    "name": f"Borrowing Book: {borrowing.book.title}",
                 },
                 "unit_amount": int(total_price * 100),
             },
             "quantity": 1,
         }],
         mode="payment",
-        success_url='https://example.com/success',
-        cancel_url='https://example.com/cancel',
+        success_url=success_url,
+        cancel_url=cancel_url,
     )
 
-    return Payment.objects.create(
-        borrowing=borrowing,
-        payment_status=Payment.PaymentStatusChoices.PENDING,
-        payment_type=Payment.PaymentTypeChoices.PAYMENT,
-        usd_to_pay=total_price,
-        session_url=session.url,
-        session_id=session.id,
-    )
+    payment.session_id = session.id
+    payment.session_url = session.url
+    payment.save()
+
+    return payment
