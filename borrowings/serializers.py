@@ -48,6 +48,15 @@ class BorrowingListSerializer(serializers.ModelSerializer):
                 }
             )
 
+        request = self.context.get("request")
+        if request and Payment.objects.filter(
+                borrowing__user=request.user,
+                payment_status=Payment.PaymentStatusChoices.PENDING,
+        ).exists():
+            raise ValidationError({
+                "non_field_errors": ["You have pending payments."]
+            })
+
         return attrs
 
     def create(self, validated_data):
