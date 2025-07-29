@@ -1,4 +1,7 @@
+from decimal import Decimal
+
 from django.utils import timezone
+from django.conf import settings
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status, viewsets
@@ -16,6 +19,8 @@ from borrowings.serializers import (
 )
 
 import stripe
+
+from utils.stripe import create_stripe_fine_payment
 
 
 class BorrowingViewSet(viewsets.ModelViewSet):
@@ -74,6 +79,15 @@ class BorrowingViewSet(viewsets.ModelViewSet):
 
         borrowing.actual_return_date = timezone.now()
         borrowing.save()
+
+        overdue_days = borrowing.calculate_overdue_days()
+        if overdue_days:
+            fine_amount = (
+                    borrowing.book.daily_fee *
+                    Decimal(overdue_days) *
+                    Decimal(settings.FINE_MULTIPLIER)
+            )
+            create_stripe_fine_payment(borrowing, fine_amount, request)
 
         return Response(
             {"message": "This book is now returned."}, status=status.HTTP_200_OK
