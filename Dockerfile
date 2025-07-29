@@ -13,4 +13,16 @@ RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD ["sh", "-c", "python manage.py makemigrations && python manage.py migrate && python manage.py collectstatic --noinput && gunicorn core.wsgi:application --bind 0.0.0.0:8000"]
+ARG SERVICE=web
+ENV SERVICE=${SERVICE}
+
+CMD if [ "$SERVICE" = "web" ]; then \
+    python manage.py makemigrations && \
+    python manage.py migrate && \
+    python manage.py collectstatic --noinput && \
+    gunicorn core.wsgi:application --bind 0.0.0.0:8000; \
+  elif [ "$SERVICE" = "celery" ]; then \
+    celery -A core worker -l info; \
+  elif [ "$SERVICE" = "beat" ]; then \
+    celery -A core beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler; \
+  fi
